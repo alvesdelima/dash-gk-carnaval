@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Carnaval 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #FFD700;
+    --magenta: #E8006F;
+    --teal: #00C9B1;
+    --dark: #0D0D1A;
+    --card: #16162A;
+    --card2: #1E1E38;
+    --text: #F0F0FF;
+    --muted: #8888AA;
+    --green: #00E5A0;
+    --red: #FF4D6D;
+    --orange: #FF8C42;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Confetti bg */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(232,0,111,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(0,201,177,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(255,215,0,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+  /* Header */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255,215,0,0.2);
+  }
+  .header-left {}
+  .tag {
+    display: inline-block;
+    background: rgba(255,215,0,0.15);
+    border: 1px solid rgba(255,215,0,0.4);
+    color: var(--gold);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 5vw, 56px);
+    letter-spacing: 2px;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--magenta) 50%, var(--teal) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .subtitle { color: var(--muted); font-size: 13px; margin-top: 6px; }
+  .header-emoji { font-size: 48px; animation: sway 2s ease-in-out infinite; }
+  @keyframes sway { 0%,100%{transform:rotate(-5deg)} 50%{transform:rotate(5deg)} }
+
+  /* KPI Cards */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .kpi {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 20px 22px;
+    border: 1px solid rgba(255,255,255,0.06);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .kpi:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+  .kpi::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: 16px 16px 0 0;
+  }
+  .kpi.gold::before { background: linear-gradient(90deg, var(--gold), var(--orange)); }
+  .kpi.teal::before { background: linear-gradient(90deg, var(--teal), #0099FF); }
+  .kpi.magenta::before { background: linear-gradient(90deg, var(--magenta), #FF6B9D); }
+  .kpi.green::before { background: linear-gradient(90deg, var(--green), var(--teal)); }
+
+  .kpi-icon { font-size: 22px; margin-bottom: 10px; }
+  .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 500; }
+  .kpi-value { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 1px; margin-top: 4px; line-height: 1; }
+  .kpi-sub { font-size: 11px; color: var(--muted); margin-top: 6px; }
+  .kpi-sub .up { color: var(--green); }
+  .kpi-sub .down { color: var(--red); }
+
+  /* Charts grid */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  @media(max-width: 700px) { .charts-grid { grid-template-columns: 1fr; } }
+
+  .chart-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 22px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .chart-card.full { grid-column: 1 / -1; }
+  .chart-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1px;
+    color: var(--gold);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Bar chart */
+  .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; }
+  .bar-label { font-size: 12px; color: var(--muted); width: 30px; flex-shrink: 0; text-align: right; }
+  .bar-wrap { flex: 1; background: rgba(255,255,255,0.04); border-radius: 6px; height: 28px; position: relative; overflow: hidden; }
+  .bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--dark);
+    transition: width 1s cubic-bezier(0.23, 1, 0.32, 1);
+    animation: growBar 1.2s cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+  @keyframes growBar { from { width: 0% !important; } }
+  .bar-val { font-size: 11px; color: var(--muted); width: 65px; text-align: right; flex-shrink: 0; }
+
+  /* Line chart */
+  .line-chart-wrap { position: relative; }
+  svg.line-chart { width: 100%; overflow: visible; }
+
+  /* Donut */
+  .donut-wrap { display: flex; align-items: center; gap: 24px; }
+  svg.donut { flex-shrink: 0; }
+  .donut-legend { display: flex; flex-direction: column; gap: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-name { color: var(--muted); }
+  .legend-val { color: var(--text); font-weight: 600; margin-left: auto; padding-left: 12px; }
+
+  /* SKU table */
+  .sku-list { display: flex; flex-direction: column; gap: 8px; }
+  .sku-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.2s;
+  }
+  .sku-row:hover { background: rgba(255,215,0,0.05); }
+  .sku-num { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: rgba(255,215,0,0.3); width: 24px; }
+  .sku-name { flex: 1; font-size: 12px; color: var(--text); line-height: 1.4; }
+  .sku-badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
+
+  /* UF horizontal bars */
+  .uf-grid { display: flex; flex-direction: column; gap: 8px; }
+  .uf-row { display: flex; align-items: center; gap: 10px; }
+  .uf-label { font-size: 13px; font-weight: 600; width: 28px; color: var(--teal); }
+  .uf-bar-wrap { flex: 1; background: rgba(255,255,255,0.04); border-radius: 4px; height: 22px; overflow: hidden; }
+  .uf-bar { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 700; color: var(--dark); animation: growBar 1.2s cubic-bezier(0.23,1,0.32,1) both; }
+  .uf-count { font-size: 12px; color: var(--muted); width: 20px; text-align: right; }
+
+  /* Coupon */
+  .coupon-wrap { display: flex; gap: 12px; flex-wrap: wrap; }
+  .coupon-card {
+    background: rgba(255,215,0,0.07);
+    border: 1px solid rgba(255,215,0,0.25);
+    border-radius: 12px;
+    padding: 14px 18px;
+    text-align: center;
+  }
+  .coupon-code { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--gold); letter-spacing: 2px; }
+  .coupon-info { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* Footer */
+  footer { text-align: center; color: var(--muted); font-size: 11px; margin-top: 32px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); }
+
+  /* Animations */
+  .fade-up { animation: fadeUp 0.6s ease both; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.2s; }
+  .delay-3 { animation-delay: 0.3s; }
+  .delay-4 { animation-delay: 0.4s; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="fade-up">
+    <div class="header-left">
+      <div class="tag">🎊 Relatório de Campanha</div>
+      <h1>Dashboard Carnaval 2026</h1>
+      <div class="subtitle">Fev 13 — Mar 03, 2026 &nbsp;·&nbsp; 19 pedidos registrados</div>
+    </div>
+    <div class="header-emoji">🥁</div>
+  </header>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi gold fade-up delay-1">
+      <div class="kpi-icon">💰</div>
+      <div class="kpi-label">Receita Total</div>
+      <div class="kpi-value">R$ 4.002</div>
+      <div class="kpi-sub">Todos os pedidos da campanha</div>
+    </div>
+    <div class="kpi green fade-up delay-1">
+      <div class="kpi-icon">✅</div>
+      <div class="kpi-label">Receita Confirmada</div>
+      <div class="kpi-value">R$ 3.382</div>
+      <div class="kpi-sub"><span class="up">14 pedidos</span> entregando ou prontos</div>
+    </div>
+    <div class="kpi magenta fade-up delay-2">
+      <div class="kpi-icon">❌</div>
+      <div class="kpi-label">Cancelamentos</div>
+      <div class="kpi-value">R$ 359</div>
+      <div class="kpi-sub"><span class="down">4 pedidos</span> cancelados (21%)</div>
+    </div>
+    <div class="kpi teal fade-up delay-3">
+      <div class="kpi-icon">🎟️</div>
+      <div class="kpi-label">Cupons Usados</div>
+      <div class="kpi-value">2</div>
+      <div class="kpi-sub">ELAINEOFF15 · FICAGK15</div>
+    </div>
+  </div>
+
+  <!-- Charts row 1 -->
+  <div class="charts-grid">
+
+    <!-- Revenue by date -->
+    <div class="chart-card full fade-up delay-2">
+      <div class="chart-title">📅 Receita por Dia</div>
+      <svg class="line-chart" height="160" id="lineSvg" viewBox="0 0 700 140" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FFD700" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#FFD700" stop-opacity="0"/>
+          </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <!-- Grid lines -->
+        <line x1="0" y1="20" x2="700" y2="20" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+        <line x1="0" y1="50" x2="700" y2="50" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+        <line x1="0" y1="80" x2="700" y2="80" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+        <line x1="0" y1="110" x2="700" y2="110" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+
+        <!-- Area fill -->
+        <path d="M50,121 L150,64 L250,128 L350,70 L450,30 L550,54 L650,64 L650,130 L50,130 Z"
+              fill="url(#lineGrad)" stroke="none"/>
+        <!-- Line -->
+        <path d="M50,121 L150,64 L250,128 L350,70 L450,30 L550,54 L650,64"
+              fill="none" stroke="#FFD700" stroke-width="2.5" stroke-linejoin="round" filter="url(#glow)"
+              stroke-dasharray="1000" stroke-dashoffset="1000">
+          <animate attributeName="stroke-dashoffset" from="1000" to="0" dur="1.5s" ease="easeOut" fill="freeze"/>
+        </path>
+        <!-- Dots -->
+        <circle cx="50" cy="121" r="5" fill="#FFD700" filter="url(#glow)"/>
+        <circle cx="150" cy="64" r="5" fill="#FFD700" filter="url(#glow)"/>
+        <circle cx="250" cy="128" r="5" fill="#FFD700" filter="url(#glow)"/>
+        <circle cx="350" cy="70" r="5" fill="#FFD700" filter="url(#glow)"/>
+        <circle cx="450" cy="30" r="5" fill="#E8006F" filter="url(#glow)"/>
+        <circle cx="550" cy="54" r="5" fill="#FFD700" filter="url(#glow)"/>
+        <circle cx="650" cy="64" r="5" fill="#00C9B1" filter="url(#glow)"/>
+        <!-- Labels -->
+        <text x="50" y="148" fill="#8888AA" font-size="11" text-anchor="middle" font-family="DM Sans">13/02</text>
+        <text x="150" y="148" fill="#8888AA" font-size="11" text-anchor="middle" font-family="DM Sans">19/02</text>
+        <text x="250" y="148" fill="#8888AA" font-size="11" text-anchor="middle" font-family="DM Sans">22/02</text>
+        <text x="350" y="148" fill="#8888AA" font-size="11" text-anchor="middle" font-family="DM Sans">23/02</text>
+        <text x="450" y="148" fill="#8888AA" font-size="11" text-anchor="middle" font-family="DM Sans">25/02</text>
+        <text x="550" y="148" fill="#8888AA" font-size="11" text-anchor="middle" font-family="DM Sans">26/02</text>
+        <text x="650" y="148" fill="#8888AA" font-size="11" text-anchor="middle" font-family="DM Sans">03/03</text>
+        <!-- Values -->
+        <text x="50" y="113" fill="#FFD700" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">R$55</text>
+        <text x="150" y="56" fill="#FFD700" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">R$1.266</text>
+        <text x="350" y="62" fill="#FFD700" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">R$591</text>
+        <text x="450" y="22" fill="#E8006F" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">R$800</text>
+        <text x="550" y="46" fill="#FFD700" font-size="10" text-anchor="middle" font-family="DM Sans" font-weight="600">R$1.010</text>
+      </svg>
+    </div>
+
+    <!-- Status donut -->
+    <div class="chart-card fade-up delay-2">
+      <div class="chart-title">📦 Status dos Pedidos</div>
+      <div class="donut-wrap">
+        <svg class="donut" width="130" height="130" viewBox="0 0 130 130">
+          <!-- Preparando Entrega: 12/19 = 63% ~ 226deg -->
+          <circle cx="65" cy="65" r="48" fill="none" stroke="#1E1E38" stroke-width="18"/>
+          <!-- Preparando Entrega -->
+          <circle cx="65" cy="65" r="48" fill="none" stroke="#00C9B1" stroke-width="18"
+            stroke-dasharray="192 110" stroke-dashoffset="0" stroke-linecap="round"
+            transform="rotate(-90 65 65)">
+            <animate attributeName="stroke-dasharray" from="0 302" to="192 110" dur="1.2s" fill="freeze" calcMode="spline" keySplines="0.25 0.1 0.25 1"/>
+          </circle>
+          <!-- Cancelado: 4/19 = 21% ~ 64deg -->
+          <circle cx="65" cy="65" r="48" fill="none" stroke="#E8006F" stroke-width="18"
+            stroke-dasharray="63 239" stroke-dashoffset="-192" stroke-linecap="round"
+            transform="rotate(-90 65 65)">
+            <animate attributeName="stroke-dasharray" from="0 302" to="63 239" dur="1.2s" fill="freeze" calcMode="spline" keySplines="0.25 0.1 0.25 1"/>
+          </circle>
+          <!-- Pronto p manuseio: 2/19 = 10% -->
+          <circle cx="65" cy="65" r="48" fill="none" stroke="#FFD700" stroke-width="18"
+            stroke-dasharray="32 270" stroke-dashoffset="-255" stroke-linecap="round"
+            transform="rotate(-90 65 65)">
+            <animate attributeName="stroke-dasharray" from="0 302" to="32 270" dur="1.2s" fill="freeze" calcMode="spline" keySplines="0.25 0.1 0.25 1"/>
+          </circle>
+          <!-- Pagamento Pendente: 1/19 = 5% -->
+          <circle cx="65" cy="65" r="48" fill="none" stroke="#FF8C42" stroke-width="18"
+            stroke-dasharray="16 286" stroke-dashoffset="-287" stroke-linecap="round"
+            transform="rotate(-90 65 65)">
+          </circle>
+          <text x="65" y="60" text-anchor="middle" fill="#F0F0FF" font-family="Bebas Neue, sans-serif" font-size="24">19</text>
+          <text x="65" y="76" text-anchor="middle" fill="#8888AA" font-family="DM Sans, sans-serif" font-size="10">pedidos</text>
+        </svg>
+        <div class="donut-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#00C9B1"></div>
+            <span class="legend-name">Preparando Entrega</span>
+            <span class="legend-val">12</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#E8006F"></div>
+            <span class="legend-name">Cancelado</span>
+            <span class="legend-val">4</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#FFD700"></div>
+            <span class="legend-name">Pronto p/ Manuseio</span>
+            <span class="legend-val">2</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#FF8C42"></div>
+            <span class="legend-name">Pagamento Pendente</span>
+            <span class="legend-val">1</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UFs -->
+    <div class="chart-card fade-up delay-3">
+      <div class="chart-title">🗺️ Estados (UF)</div>
+      <div class="uf-grid">
+        <div class="uf-row">
+          <div class="uf-label">SP</div>
+          <div class="uf-bar-wrap"><div class="uf-bar" style="width:100%;background:linear-gradient(90deg,#FFD700,#FF8C42)">SP</div></div>
+          <div class="uf-count">6</div>
+        </div>
+        <div class="uf-row">
+          <div class="uf-label">PE</div>
+          <div class="uf-bar-wrap"><div class="uf-bar" style="width:50%;background:linear-gradient(90deg,#E8006F,#FF6B9D)">PE</div></div>
+          <div class="uf-count">3</div>
+        </div>
+        <div class="uf-row">
+          <div class="uf-label">RS</div>
+          <div class="uf-bar-wrap"><div class="uf-bar" style="width:50%;background:linear-gradient(90deg,#00C9B1,#0099FF)">RS</div></div>
+          <div class="uf-count">3</div>
+        </div>
+        <div class="uf-row">
+          <div class="uf-label">MA</div>
+          <div class="uf-bar-wrap"><div class="uf-bar" style="width:33%;background:linear-gradient(90deg,#9B5DE5,#C77DFF)"></div></div>
+          <div class="uf-count">2</div>
+        </div>
+        <div class="uf-row">
+          <div class="uf-label">PA</div>
+          <div class="uf-bar-wrap"><div class="uf-bar" style="width:33%;background:linear-gradient(90deg,#00E5A0,#00C9B1)"></div></div>
+          <div class="uf-count">2</div>
+        </div>
+        <div class="uf-row">
+          <div class="uf-label">SC</div>
+          <div class="uf-bar-wrap"><div class="uf-bar" style="width:17%;background:rgba(255,255,255,0.2)"></div></div>
+          <div class="uf-count">1</div>
+        </div>
+        <div class="uf-row">
+          <div class="uf-label">PB</div>
+          <div class="uf-bar-wrap"><div class="uf-bar" style="width:17%;background:rgba(255,255,255,0.2)"></div></div>
+          <div class="uf-count">1</div>
+        </div>
+        <div class="uf-row">
+          <div class="uf-label">RO</div>
+          <div class="uf-bar-wrap"><div class="uf-bar" style="width:17%;background:rgba(255,255,255,0.2)"></div></div>
+          <div class="uf-count">1</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SKUs -->
+  <div class="chart-card fade-up delay-3" style="margin-bottom:16px;">
+    <div class="chart-title">🎓 Top Cursos Vendidos</div>
+    <div class="sku-list">
+      <div class="sku-row">
+        <div class="sku-num">01</div>
+        <div class="sku-name">Estética Facial: Aplicações de Acupuntura</div>
+        <div class="sku-badge" style="background:rgba(255,215,0,0.15);color:#FFD700">2 vendas</div>
+      </div>
+      <div class="sku-row">
+        <div class="sku-num">02</div>
+        <div class="sku-name">Acupuntura Aplicada à Estética Facial</div>
+        <div class="sku-badge" style="background:rgba(255,215,0,0.15);color:#FFD700">2 vendas</div>
+      </div>
+      <div class="sku-row">
+        <div class="sku-num">03</div>
+        <div class="sku-name">Ética e Bioética (DISCIPLINA UNINASSAU)</div>
+        <div class="sku-badge" style="background:rgba(0,201,177,0.12);color:#00C9B1">1 venda · R$800</div>
+      </div>
+      <div class="sku-row">
+        <div class="sku-num">04</div>
+        <div class="sku-name">Nutrição e Dietética (DISCIPLINA UNINASSAU)</div>
+        <div class="sku-badge" style="background:rgba(0,201,177,0.12);color:#00C9B1">1 venda · R$549</div>
+      </div>
+      <div class="sku-row">
+        <div class="sku-num">05</div>
+        <div class="sku-name">Fundamentos da Fenomenologia e Existencialismo (UNINASSAU)</div>
+        <div class="sku-badge" style="background:rgba(0,201,177,0.12);color:#00C9B1">1 venda · R$700</div>
+      </div>
+      <div class="sku-row">
+        <div class="sku-num">06</div>
+        <div class="sku-name">Metodologia e Prática do Ensino da Língua Inglesa (UNIFAEL)</div>
+        <div class="sku-badge" style="background:rgba(255,140,66,0.12);color:#FF8C42">1 venda · R$260</div>
+      </div>
+      <div class="sku-row">
+        <div class="sku-num">07</div>
+        <div class="sku-name">Matemática Aplicada (DISCIPLINA UNINASSAU)</div>
+        <div class="sku-badge" style="background:rgba(255,140,66,0.12);color:#FF8C42">1 venda · R$490</div>
+      </div>
+      <div class="sku-row">
+        <div class="sku-num">08</div>
+        <div class="sku-name">Arquitetura e Serviços de Computação em Nuvem</div>
+        <div class="sku-badge" style="background:rgba(232,0,111,0.12);color:#FF6B9D">1 venda · R$80</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Coupons -->
+  <div class="chart-card fade-up delay-4" style="margin-bottom:16px;">
+    <div class="chart-title">🎟️ Cupons Utilizados</div>
+    <div class="coupon-wrap">
+      <div class="coupon-card">
+        <div class="coupon-code">ELAINEOFF15</div>
+        <div class="coupon-info">1 uso · Pedido: R$ 16,97</div>
+      </div>
+      <div class="coupon-card">
+        <div class="coupon-code">FICAGK15</div>
+        <div class="coupon-info">1 uso · Pedido: R$ 42,42</div>
+      </div>
+      <div class="coupon-card" style="background:rgba(255,255,255,0.02);border-color:rgba(255,255,255,0.08)">
+        <div class="coupon-code" style="color:#8888AA;font-size:16px;">17 pedidos</div>
+        <div class="coupon-info">sem cupom utilizado</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Campanha Carnaval 2026 &nbsp;·&nbsp; Gerado automaticamente &nbsp;·&nbsp; 🎉
+  </footer>
+
+</div>
+</body>
+</html>
